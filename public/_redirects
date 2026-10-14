@@ -1,0 +1,31 @@
+# Cloudflare Pages redirects/rewrites file.
+# Docs: https://developers.cloudflare.com/pages/configuration/redirects/
+#
+# KiraStream is a client-rendered Next.js app deployed as a static export
+# (output: 'export'). Dynamic [param] routes have no getStaticPaths, so Next
+# exports them as literal "shell" files (e.g. /anime/[slug].html) that hydrate
+# client-side from the URL. To make real deep links (e.g. /anime/one-piece)
+# and hard refreshes work, each dynamic pattern is rewritten onto its shell.
+#
+# Status 200 = rewrite (serve the target without changing the URL).
+# Static routes (/anime, /manga, /login, ...) need NO rule here: Cloudflare
+# Pages serves "/anime" from the exported "/anime.html" automatically.
+#
+# Order matters (first match wins), so the deeper patterns come first.
+
+/anime/:slug /anime/[slug].html 200
+
+/groups/:id /groups/[id].html 200
+
+/messages/:id /messages/[id].html 200
+
+/manga/read/:slug /manga/read/[slug].html 200
+/manga/genre/:slug /manga/genre/[slug].html 200
+/manga/:slug /manga/[slug].html 200
+
+/novel/read/:slug /novel/read/[slug].html 200
+/novel/genre/:slug /novel/genre/[slug].html 200
+/novel/:slug /novel/[slug].html 200
+
+/webtoon/read/:slug /webtoon/read/[slug].html 200
+/webtoon/:slug /webtoon/[slug].html 200

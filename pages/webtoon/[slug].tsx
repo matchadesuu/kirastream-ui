@@ -1,0 +1,146 @@
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import Head from 'next/head'
+import Link from 'next/link'
+import { ScrollText, Frown, Share2 } from 'lucide-react'
+import { useSettings } from '@/contexts/SettingsContext'
+import { useAuth } from '@/contexts/AuthContext'
+import { translate } from '@/lib/i18n'
+import { apiUrl } from '@/lib/apiBase'
+import { saveHistory } from '@/lib/firebase'
+import ShareModal from '@/components/ShareModal'
+
+interface WebtoonEpisode {
+  title: string
+  thumbnail: string
+  url: string
+}
+
+interface WebtoonDetailData {
+  title: string
+  thumbnail: string
+  url: string
+  episodes: WebtoonEpisode[]
+}
+
+export default function WebtoonDetailPage() {
+  const router = useRouter()
+  const { slug } = router.query
+  const { language } = useSettings()
+  const { user } = useAuth()
+  const t = (key: string) => translate(language, key)
+  const [webtoon, setWebtoon] = useState<WebtoonDetailData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
+  const imageProxy = (url: string) => apiUrl(`/api/proxy?url=${encodeURIComponent(url)}`)
+
+  useEffect(() => {
+    if (!slug || typeof slug !== 'string') return
+    const url = decodeURIComponent(slug)
+    setLoading(true)
+    setError(false)
+    fetch(apiUrl(`/api/webtoon?action=detail&url=${encodeURIComponent(url)}`))
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          setError(true)
+        } else {
+          setWebtoon(data)
+          if (data && user) {
+            saveHistory({
+              slug,                    // route param IS the encoded webtoon url
+              title: data.title,
+              image: data.thumbnail,
+              timestamp: Date.now(),
+            }, 'webtoon')
+          }
+        }
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('Webtoon detail fetch error:', err)
+        setError(true)
+        setLoading(false)
+      })
+  }, [slug, user])
+
+  if (loading) {
+    return (
+      <div className="text-center py-20">
+        <div className="w-10 h-10 border-[3px] border-[var(--color-border)] border-t-[var(--color-primary)] rounded-full animate-spin mx-auto mb-4" />
+        <p style={{ color: 'var(--color-text-muted)' }}>{t('webtoon.loadingDetail')}</p>
+      </div>
+    )
+  }
+
+  if (error || !webtoon) {
+    return (
+      <div className="text-center py-20 card p-6">
+        <Frown className="mx-auto mb-3" style={{ color: 'var(--color-text-muted)' }} size={40} />
+        <p className="text-xl mb-4" style={{ color: 'var(--color-text)' }}>{t('webtoon.notFound')}</p>
+        <Link href="/webtoon" className="btn-primary">{t('webtoon.backToWebtoon')}</Link>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <Head><title>{webtoon.title} - KiraStream</title></Head>
+      <div className="space-y-8">
+        <div className="card p-6 flex gap-6 flex-col md:flex-row">
+          <div className="w-48 h-72 flex-shrink-0 overflow-hidden rounded-lg bg-surface-dark mx-auto md:mx-0">
+            {webtoon.thumbnail ? (
+              <img src={imageProxy(webtoon.thumbnail)} alt={webtoon.title} className="w-full h-full object-cover" />
+            ) : null}
+          </div>
+          <div className="flex-1 space-y-3">
+            <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-text)]">{webtoon.title}</h1>
+            <button onClick={() => setShareOpen(true)} className="btn-secondary inline-flex items-center gap-2 text-sm">
+              <Share2 size={16} /> {t('share.title')}
+            </button>
+          </div>
+        </div>
+
+        <div className="card p-6">
+          <h2 className="text-xl font-bold text-[var(--color-text)] mb-4 flex items-center gap-2">
+            <ScrollText size={20} className="text-ocean" /> {t('webtoon.episodes').replace('{n}', String(webtoon.episodes?.length || 0))}
+          </h2>
+
+          {!webtoon.episodes || webtoon.episodes.length === 0 ? (
+            <p className="text-[var(--color-text-muted)]">{t('webtoon.noEpisodes')}</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-96 overflow-y-auto pr-2">
+              {webtoon.episodes.map((ep, i) => (
+                <Link
+                  key={i}
+                  href={`/webtoon/read/${encodeURIComponent(ep.url)}`}
+                  className="flex items-center justify-between p-3 bg-surface-dark hover:bg-surface-hover rounded-lg transition-colors group"
+                >
+                  <span className="text-sm font-medium text-[var(--color-text)] group-hover:text-ocean transition-colors truncate">
+                    {ep.title || t('webtoon.episodeN').replace('{n}', String(i + 1))}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Share Modal */}
+        {webtoon && (
+          <ShareModal
+            open={shareOpen}
+            onClose={() => setShareOpen(false)}
+            item={{
+              kind: 'webtoon',
+              slug: slug as string,
+              title: webtoon.title,
+              image: webtoon.thumbnail,
+              href: `/webtoon/${slug}`,
+            }}
+          />
+        )}
+      </div>
+    </>
+  )
+}

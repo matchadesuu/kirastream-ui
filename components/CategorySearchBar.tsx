@@ -1,0 +1,48 @@
+import { useState, FormEvent } from 'react'
+import { useRouter } from 'next/router'
+import { Search } from 'lucide-react'
+import { useSettings } from '@/contexts/SettingsContext'
+import { translate } from '@/lib/i18n'
+
+interface CategorySearchBarProps {
+  type: 'anime' | 'manga' | 'webtoon' | 'novel'
+  placeholder?: string
+  className?: string
+}
+
+export default function CategorySearchBar({ type, placeholder, className }: CategorySearchBarProps) {
+  const router = useRouter()
+  const [query, setQuery] = useState('')
+  const { language } = useSettings()
+  const t = (key: string) => translate(language, key)
+  const fallbackPlaceholder = t('searchbar.placeholder')
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault()
+    if (query.trim()) {
+      router.push(`/search?q=${encodeURIComponent(query.trim())}&type=${type}`)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className={`relative w-full sm:w-72 shrink-0 ${className || ''}`}>
+      <input
+        type="search"
+        name="q"
+        autoComplete="off"
+        aria-label={placeholder?.replace(/\u2026$/, '') || t('searchbar.searchTitle')}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={placeholder || fallbackPlaceholder}
+        className="input-field py-2.5 pr-11 text-sm"
+      />
+      <button
+        type="submit"
+        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-ocean hover:bg-oceanAccent-secondary rounded-full transition-colors"
+        aria-label={t('search.submit')}
+      >
+        <Search size={14} className="text-white" aria-hidden="true" />
+      </button>
+    </form>
+  )
+}

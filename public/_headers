@@ -1,0 +1,11 @@
+# Cloudflare Pages headers file.
+# Mirrors the old next.config.js `headers()` rules, which are unsupported by
+# Next.js static export (output: 'export').
+# Docs: https://developers.cloudflare.com/pages/configuration/headers/
+
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Service-Worker-Allowed: /
+
+/manifest.json
+  Cache-Control: public, max-age=3600

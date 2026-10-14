@@ -1,0 +1,32 @@
+/* ─── KIRA-NIME DESIGN SYSTEM — CINEMA ─────────────────────── */
+
+/* Komponen inti (.card, .btn-primary, .btn-secondary, .anime-card,
+   .anime-grid, .section-title, .skeleton) didefinisikan di globals.css
+   lewat @layer components — jadi utilitas Tailwind (mis. rounded-full,
+   text-xs, hover:*) tetap menang di cascade.
+   File ini hanya berisi class yang sengaja un-layered agar tidak kalah
+   oleh utilitas. */
+
+/* Tabs */
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-bottom: 2px solid transparent;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--color-text);
+}
+
+.tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
