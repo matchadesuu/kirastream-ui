@@ -30,6 +30,7 @@ Platform streaming anime bersubtitle Indonesia sekaligus tempat baca manga, nove
 - [PWA & Service Worker](#-pwa--service-worker)
 - [Deploy](#-deploy)
 - [Kontribusi](#-kontribusi)
+- [Contributors](#-contributors)
 - [Roadmap](#️-roadmap)
 - [FAQ](#-faq)
 - [Lisensi](#-lisensi)
@@ -287,6 +288,28 @@ Tanpa Firebase, fitur autentikasi, favorit, riwayat, pertemanan, grup, dan chat 
 
 **Bisakah dijalankan tanpa Firebase untuk eksperimen cepat?**
 Sebagian besar halaman konten dapat dijalankan, namun halaman yang bergantung pada autentikasi (`login`, `profile`, `friends`, `groups`, `messages`) memerlukan konfigurasi Firebase yang valid.
+
+## 👥 Contributors
+
+Terima kasih kepada semua yang telah membantu membangun KiraStream 💜
+
+| Contributor | Peran |
+| --- | --- |
+| [ryouhtml](https://github.com/ryouhtml) | Author & Maintainer |
+
+**Dibantu oleh asisten AI:**
+
+| Tool | Situs |
+| --- | --- |
+| OpenCode | <https://opencode.ai> |
+| Gemini | <https://gemini.google.com> |
+| Claude | <https://claude.ai> |
+| ChatGPT | <https://chatgpt.com> |
+| Grok | <https://grok.com> |
+| Perplexity | <https://www.perplexity.ai> |
+| DeepSeek | <https://www.deepseek.com> |
+
+Lihat [`CONTRIBUTORS.md`](./CONTRIBUTORS.md) untuk daftar lengkap.
 
 ## 📄 Lisensi
 
